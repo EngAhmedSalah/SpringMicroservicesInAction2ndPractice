@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: configServer
+  cloud:
+    config:
+      server:
+        git:
+          default-label: origin
+          uri: https://github.com/EngAhmedSalah/ConfigServerRepo.git
+          clone-on-start: true
+          search-paths: /config
+          timeout: 5  # Set a 5-second timeout
+server:
+  port: 8888
+
