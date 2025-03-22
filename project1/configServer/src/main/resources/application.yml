@@ -1,3 +1,6 @@
+server:
+  port: 8888
+
 spring:
   application:
     name: configServer
@@ -10,6 +13,15 @@ spring:
           clone-on-start: true
           search-paths: /config
           timeout: 5  # Set a 5-second timeout
-server:
-  port: 8888
 
+encrypt:
+  key: mykey
+
+#        vault:
+#          host: localhost
+#          port: 8200
+#          scheme: http
+#          authentication: token
+#          token: root
+#          backend: secret
+#          default-context: application
