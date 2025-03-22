@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK17'    // Ensure 'JDK17' is configured in Global Tool Configuration
+        maven 'MAVEN3' // Ensure 'MAVEN3' is configured in Global Tool Configuration
+    }
+
+    environment {
+        IMAGE_NAME = "sweahmedsalah98/user-service"
+        CONTAINER_NAME = "user-service"
+        GIT_BRANCH = "origin"  // Replace with your actual branch (e.g., 'main')
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: "${GIT_BRANCH}", url: 'https://github.com/EngAhmedSalah/SpringMicroservicesInAction2ndPractice.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                dir('project1/UserService') {  // Navigate directly to the correct directory
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME:latest project1/UserService/'  // Correct path
+            }
+        }
+
+        stage('Push to Docker Hub') {
+        steps {
+            withCredentials([string(credentialsId: 'docker-hub-credentials', variable: 'DOCKER_HUB_TOKEN')]) {
+                sh 'echo $DOCKER_HUB_TOKEN | docker login -u sweahmedsalah98 --password-stdin'
+                sh 'docker push $IMAGE_NAME:latest'
+            }
+        }
+    }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                docker stop $CONTAINER_NAME || true
+                docker rm $CONTAINER_NAME || true
+                docker run -d --name $CONTAINER_NAME -p 8080:8080 $IMAGE_NAME:latest
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ User Service deployed successfully!"
+        }
+        failure {
+            echo "❌ Build failed. Check logs for details."
+        }
+    }
+}
