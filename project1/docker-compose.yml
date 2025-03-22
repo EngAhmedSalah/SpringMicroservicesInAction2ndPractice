@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: MySqlDb
+    image: mysql/mysql-server:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  vault:
+    container_name: Vault
+    image: hashicorp/vault:latest
+    restart: always
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_ADDR: "http://0.0.0.0:8200"
+    ports:
+      - "8200:8200"
+    command: "vault server -dev -dev-listen-address=0.0.0.0:8200 -dev-root-token-id=root"
+    volumes:
+      - vault_data:/vault/data
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: unless-stopped
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Enables Jenkins to use Docker
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=true  # Auto-skip setup wizard (optional)
+      - JENKINS_USER=admin
+      - JENKINS_PASS=admin  # Change this in production!
+
+volumes:
+  mysql_data:
+  vault_data:
+  jenkins_home:
+    driver: local
