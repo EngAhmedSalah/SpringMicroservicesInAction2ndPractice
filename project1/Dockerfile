@@ -20,9 +20,9 @@ FROM openjdk:17
 WORKDIR /app
 
 # Copy the JARs from each service
-COPY --from=builder /app/EurekaServer/target/*.jar eureka-server.jar
-COPY --from=builder /app/configServer/target/*.jar config-server.jar
-COPY --from=builder /app/UserService/target/*.jar user-service.jar
+COPY --from=builder /project1/configServer/target/*.jar eureka-server.jar
+COPY --from=builder /project1/configServer/target/*.jar config-server.jar
+COPY --from=builder /project1/UserService/target/*.jar user-service.jar
 
 # Expose ports for Eureka (8761), Config Server (8888), and UserService (8081)
 EXPOSE 8761 8888 8081
