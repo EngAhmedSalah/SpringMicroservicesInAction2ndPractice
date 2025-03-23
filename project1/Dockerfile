@@ -1,5 +1,5 @@
 # Stage 1: Build the applications
-FROM maven:3.8.6-openjdk-17-slim AS builder
+FROM openjdk:17
 
 WORKDIR /app
 
@@ -14,7 +14,8 @@ RUN cd configServer && mvn clean package -DskipTests
 RUN cd UserService && mvn clean package -DskipTests
 
 # Stage 2: Create the runtime image
-FROM openjdk:17-jdk-slim
+FROM openjdk:17
+
 
 WORKDIR /app
 
